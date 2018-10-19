@@ -130,9 +130,8 @@ Please remember to substitute them with the details specific to edge fabric info
     c8fn-cli remove hello-pydemo -g http://fabric.macrometa.io 
     ```
 
-## Additional Details...
 
-### Templates
+## Templates
 
 Command: `c8fn-cli new FUNCTION_NAME --lang python/node/go/ruby/Dockerfile/etc`
 
@@ -164,7 +163,7 @@ Curated language templates:
 
 Read more on [community templates here](TEMPLATE.md).
 
-### Docker image as a function
+## Docker image as a function
 
 Specify `lang: Dockerfile` if you want the c8fn-cli to execute a build or `skip_build: true` for pre-built images.
 
@@ -172,7 +171,7 @@ Specify `lang: Dockerfile` if you want the c8fn-cli to execute a build or `skip_
 * Package anything
 * If you are using a stack file add the `skip_build: true` attribute
 
-### Private registries
+## Private registries
 
 Create a named image pull secret and add the secret name to the `secrets` section of your YAML file or your deployment arguments with `--secret`.
 
