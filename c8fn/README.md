@@ -1,6 +1,8 @@
 # c8fn-cli
 
-C8Fn CLI is a tool to build and deploy serverless-functions to Macrometa Edge Fabric. You can build C8Fn functions from a set of supported language templates (such as Node.js, Python, CSharp and Ruby). That means you just write a handler file such as (handler.py/handler.js) and the CLI does the rest to create a Docker image.
+C8Fn CLI is a tool to build and deploy serverless-functions to Macrometa Edge Fabric. 
+
+You can build C8Fn functions from a set of supported language templates (such as Node.js, Python, CSharp and Ruby). That means you just write a handler file such as (handler.py/handler.js) and the CLI does the rest to create a Docker image.
 
 ## Run the CLI
 
