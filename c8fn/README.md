@@ -251,13 +251,13 @@ Please remember to substitute them with the details specific to edge fabric info
 
 5. Use the `deploy` command, deploy the function onto your C8 Edge Fabric setup:
 
-  a. Example deploy with all command line options, these will **override** the corresponding settings in the YAML definition file for the function :
+     a. Example deploy with all command line options, these will **override** the corresponding settings in the YAML definition file for the function :
   
     ```bash
         c8fn-cli deploy -f hello-pydemo.yml -t tenant1 -g http://fabric.macrometa.io -n 'fabric-us-west-2, fabric-eu-central-1'
     ```
     
-   b. Example deploy using the parameters in the YAML file:
+    b. Example deploy using the parameters in the YAML file:
     ```
         c8fn-cli deploy -f hello-pydemo.yml
     ```
