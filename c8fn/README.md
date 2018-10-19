@@ -203,7 +203,7 @@ Use environmental variables for setting tokens and configuration.
 
 ------
 
-## Sample complete Function-As-A-Service workflow
+## Sample workflow
 
 This series of steps demonstrates how to `create, build, push, deploy, list, invoke and remove` a python Function in in a Macrometa C8 Edge Data Fabric environment.
 
