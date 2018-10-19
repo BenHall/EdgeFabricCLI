@@ -1,0 +1,88 @@
+provider:
+  name: c8fn
+  gateway: https://fabric.macrometa.io  # url of macrometa edge fabric
+  tenant: guest
+  network: "func_functions"       # this is optional and defaults to func_functions
+
+functions:
+  hello-c8fnpy:
+      lang: python3
+      handler: ./hello-c8fnpy
+      image: macrometa/hello-c8fnpy
+      edge_locations:
+        - fabric-us-east-1
+        - fabric-us-east-2
+        - fabric-us-west-1
+        - fabric-us-west-2
+        - fabric-ap-south-1
+        - fabric-ap-northeast-2
+        - fabric-ap-southeast-1
+        - fabric-ap-southeast-2
+        - fabric-ap-northeast-1
+        - fabric-ca-central-1
+        - fabric-eu-central-1
+        - fabric-eu-west-1
+        - fabric-eu-west-2
+        - fabric-sa-east-1 
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m     
+
+  url-ping:
+    lang: python
+    handler: ./sample/url-ping
+    image: alexellis/openfaas-url-ping:0.2
+    edge_locations:
+      - fabric-us-east-1
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
+  stronghash:
+    skip_build: true
+    image: functions/alpine:latest
+    fprocess: "sha512sum"
+    edge_locations:
+      - fabric-us-east-1
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
+  nodejs-echo:
+    lang: node
+    handler: ./sample/nodejs-echo
+    image: alexellis/openfaas-nodejs-echo:0.1
+    edge_locations:
+      - fabric-us-east-1
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
+  # curl 127.0.0.1:8080/function/shrink-image --data-binary @big.png > smaller.png
+  shrink-image:
+    lang: dockerfile
+    handler: ./sample/imagemagick
+    image: functions/resizer:0.1
+    fprocess: "convert - -resize 50% fd:1"
+    edge_locations:
+      - fabric-us-east-1
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
+  ruby-echo:
+    lang: ruby
+    handler: ./sample/ruby-echo
+    image: alexellis/ruby-echo:0.2
+    edge_locations:
+      - fabric-us-east-1
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
