@@ -36,6 +36,102 @@ Help for all of the commands supported by the CLI can be found by running:
 
 You can chose between using a programming language template where you only need to provide a handler file, or a Docker that you can build yourself.
 
+## Sample workflow
+
+This series of steps demonstrates how to `create, build, push, deploy, list, invoke and remove` a python Function in in a Macrometa C8 Edge Data Fabric environment.
+
+The python function has a very simple functionality - it just echoes the input that was passed when invoking the function.
+
+**NOTE:**
+
+All mentions of the edge fabric details in the examples below are just that - examples.
+
+Please remember to substitute them with the details specific to edge fabric information provided to you.
+
+1. Create a python function called `hello-pydemo` using the `new` command:
+
+    ```bash
+    mkdir hello-pydemo
+    cd hello-pydemo
+    c8fn-cli new --lang python hello-pydemo -p macrometa -t tenant1 -g http://fabric.macrometa.io -n 'fabric-us-west-2, fabric-eu-central-1'
+    ```
+2. Edit the function handler code as follows:
+
+    ```python
+        def handle(req):
+            """handle a request to the function
+            Args:
+                req (str): request body
+            """ 
+            print("Hello from C8Fn pydemo. ")
+            return "You said: "+req
+    ```
+    
+3. Use the `build` command, build the new function we created above as a Docker image:
+
+    ```bash
+        c8fn-cli build -f hello-pydemo.yml
+    ```
+
+4. Use the `push` command, push the built function to your dockerhub repo:
+
+    ```bash
+    c8fn-cli push -f hello-pydemo.yml 
+    ```
+    **Note:** You can also just use `docker push` if you prefer.
+    
+    **IMPORTANT NOTE:** After the `push`, make sure to set the function repo to `public` in your Dockerhub, otherwise function invocation **may fail.**
+
+5. Use the `deploy` command, deploy the function onto your C8 Edge Fabric setup:
+
+     a. Example deploy with all command line options, these will **override** the corresponding settings in the YAML definition file for the function :
+  
+    ```bash
+        c8fn-cli deploy -f hello-pydemo.yml -t tenant1 -g http://fabric.macrometa.io -n 'fabric-us-west-2, fabric-eu-central-1'
+    ```
+    
+    b. Example deploy using the parameters in the YAML file:
+    ```
+        c8fn-cli deploy -f hello-pydemo.yml
+    ```
+    
+6. Use the `list` command to check whether function is available:
+
+    ```bash
+    c8fn-cli list -g http://fabric.macrometa.io
+    ```
+    Example output:
+    ```bash
+    Function        Invocations    	Replicas	Edge Locations                      
+    --------        -----------    	--------	--------------                        
+    hello-pydemo    0              	1    	fabric-us-west-2, fabric-eu-central-1
+    ```
+
+7. Use the `invoke` command to invoke the function from your C8 Edge Fabric deployment:
+
+    ```bash
+    echo 'Hello' | c8fn-cli invoke hello-pydemo -g http://fabric.macrometa.io
+    ```
+
+   via curl:
+   
+   ```bash
+   curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' 'http://fabric.macrometa.ioc8/_fn/_tenant/tenant1/sync/hello-pydemo'
+   ```
+   
+   Example output:
+    ```
+    "Hello from C8Fn pydemo. You said: Hello"
+    ```
+    
+8. Use the `remove` command to remove/delete the deployed function:
+
+    ```bash
+    c8fn-cli remove hello-pydemo -g http://fabric.macrometa.io 
+    ```
+
+## Additional Details...
+
 ### Templates
 
 Command: `c8fn-cli new FUNCTION_NAME --lang python/node/go/ruby/Dockerfile/etc`
@@ -202,98 +298,4 @@ functions:
 Use environmental variables for setting tokens and configuration.
 
 ------
-
-## Sample workflow
-
-This series of steps demonstrates how to `create, build, push, deploy, list, invoke and remove` a python Function in in a Macrometa C8 Edge Data Fabric environment.
-
-The python function has a very simple functionality - it just echoes the input that was passed when invoking the function.
-
-**NOTE:**
-
-All mentions of the edge fabric details in the examples below are just that - examples.
-
-Please remember to substitute them with the details specific to edge fabric information provided to you.
-
-1. Create a python function called `hello-pydemo` using the `new` command:
-
-    ```bash
-    mkdir hello-pydemo
-    cd hello-pydemo
-    c8fn-cli new --lang python hello-pydemo -p macrometa -t tenant1 -g http://fabric.macrometa.io -n 'fabric-us-west-2, fabric-eu-central-1'
-    ```
-2. Edit the function handler code as follows:
-
-    ```python
-        def handle(req):
-            """handle a request to the function
-            Args:
-                req (str): request body
-            """ 
-            print("Hello from C8Fn pydemo. ")
-            return "You said: "+req
-    ```
-    
-3. Use the `build` command, build the new function we created above as a Docker image:
-
-    ```bash
-        c8fn-cli build -f hello-pydemo.yml
-    ```
-
-4. Use the `push` command, push the built function to your dockerhub repo:
-
-    ```bash
-    c8fn-cli push -f hello-pydemo.yml 
-    ```
-    **Note:** You can also just use `docker push` if you prefer.
-    
-    **IMPORTANT NOTE:** After the `push`, make sure to set the function repo to `public` in your Dockerhub, otherwise function invocation **may fail.**
-
-5. Use the `deploy` command, deploy the function onto your C8 Edge Fabric setup:
-
-     a. Example deploy with all command line options, these will **override** the corresponding settings in the YAML definition file for the function :
-  
-    ```bash
-        c8fn-cli deploy -f hello-pydemo.yml -t tenant1 -g http://fabric.macrometa.io -n 'fabric-us-west-2, fabric-eu-central-1'
-    ```
-    
-    b. Example deploy using the parameters in the YAML file:
-    ```
-        c8fn-cli deploy -f hello-pydemo.yml
-    ```
-    
-6. Use the `list` command to check whether function is available:
-
-    ```bash
-    c8fn-cli list -g http://fabric.macrometa.io
-    ```
-    Example output:
-    ```bash
-    Function        Invocations    	Replicas	Edge Locations                      
-    --------        -----------    	--------	--------------                        
-    hello-pydemo    0              	1    	fabric-us-west-2, fabric-eu-central-1
-    ```
-
-7. Use the `invoke` command to invoke the function from your C8 Edge Fabric deployment:
-
-    ```bash
-    echo 'Hello' | c8fn-cli invoke hello-pydemo -g http://fabric.macrometa.io
-    ```
-
-   via curl:
-   
-   ```bash
-   curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' 'http://fabric.macrometa.ioc8/_fn/_tenant/tenant1/sync/hello-pydemo'
-   ```
-   
-   Example output:
-    ```
-    "Hello from C8Fn pydemo. You said: Hello"
-    ```
-    
-8. Use the `remove` command to remove/delete the deployed function:
-
-    ```bash
-    c8fn-cli remove hello-pydemo -g http://fabric.macrometa.io 
-    ```
 
