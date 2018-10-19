@@ -1,4 +1,4 @@
-# c8fn-cli
+# C8Fn CLI
 
 C8Fn CLI is a tool to build and deploy serverless-functions to Macrometa Edge Fabric. 
 
