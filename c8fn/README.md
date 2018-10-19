@@ -91,13 +91,16 @@ Here is an example file using the `stack.yml` file included in the repository.
 ```yaml
 provider:
   name: c8fn
-  gateway: http://127.0.0.1:8080
+  gateway: https://fabric.macrometa.io  # url of macrometa edge fabric
+  tenant: guest # name of the tenant
 
 functions:
   url-ping:
     lang: python
     handler: ./sample/url-ping
-    image: alexellis2/c8fn-urlping
+    image: alexellis2/url-ping
+    edge_locations:
+      - fabric-us-east-1
 ```
 
 This url-ping function is defined in the sample/url-ping folder makes use of Python. All we had to do was to write a `handler.py` file and then to list off any Python modules in `requirements.txt`.
@@ -127,18 +130,6 @@ $ c8fn-cli deploy -f ./stack.yml
 ```
 
 ## YAML format reference
-
-### Secure secret management
-
-Secrets can be used with C8Fn when using Docker Swarm or Kubernetes, this means your data is encrypted at rest and is less likely to be leaked during logging / stack traces than with environmental variables.
-
-```yaml
-  secrets:
-    - secret-name-1
-    - secret-name-2
-```
-
-Secrets should be defined in the cluster ahead of time using `docker secret create` or `kubectl`.
 
 ### Environmental variables/configuration
 
@@ -175,40 +166,12 @@ functions:
   url-ping:
     lang: python
     handler: ./sample/url-ping
-    image: alexellis2/c8fn-urlping
+    image: alexellis2/url-ping
+    edge_locations:
+        - fabric-us-east-1
     environment:
       http_proxy: http://proxy1.corp.com:3128
       no_proxy: http://gateway/
-```
-
-### Constraints
-
-Constraints work with Docker Swarm and are useful for pinning functions to certain hosts.
-
-Here is an example of picking only Linux:
-
-```yaml
-   constraints:
-     - "node.platform.os == linux"
-```
-
-Or only Windows:
-
-```yaml
-   constraints:
-     - "node.platform.os == windows"
-```
-
-### Labels
-
-Labels can be applied through a map which may be consumed by the back-end scheduler such as Docker Swarm or Kubernetes.
-
-For example:
-
-```yaml
-   labels:
-     kafka.topic: topic1
-     canary: true
 ```
 
 ### Other YAML fields
@@ -227,31 +190,16 @@ functions:
     labels:
       label1: value1
       label2: "value2"
-   constraints:
-     - "com.hdd == ssd"
-   edge-locations:
+#   limits:
+#     memory: 40m
+#   requests:
+#     memory: 40m 
+   edge_locations:
      - <EDGE_LOC_1>
      - ...
 ```
 
 Use environmental variables for setting tokens and configuration.
-
-## Access functions with `curl`
-
-You can initiate a HTTP POST via `curl`:
-
-* with the `-d` flag i.e. `-d "my data here"`
-* or with `--data-binary @filename.txt` to send a whole file including newlines
-* if you want to pass input from STDIN then use `--data-binary @-`
-
-```
-$ curl -d '{"hello": "world"}' http://127.0.0.1:8080/function/nodejs-echo
-{ nodeVersion: 'v6.9.1', input: '{"hello": "world"}' }
-
-$ curl --data-binary @README.md http://127.0.0.1:8080/function/nodejs-echo
-
-$ uname -a | curl http://127.0.0.1:8080/function/nodejs-echo--data-binary @-
-```
 
 ------
 
@@ -263,13 +211,14 @@ The python function has a very simple functionality - it just echoes the input t
 
 **NOTE:**
 All mentions of the C8 Deployment-specific details in the examples below are just that - examples.
+
 Please remember to substitute them with the details specific to your own C8 Deployment.
 
 1. Create a python function called `hello-pydemo` using the `new` command:
     ```bash
     mkdir hello-pydemo
     cd hello-pydemo
-    c8fn-cli new --lang python hello-pydemo -p macrometa -t _mm -g http://durga-e50-us-west-2.dev.aws.macrometa.io -n 'durga-e50-us-west-2, durga-3a8-eu-central-1'
+    c8fn-cli new --lang python hello-pydemo -p macrometa -t _mm -g http://fabric.macrometa.io -n 'fabric-us-west-2, fabric-eu-central-1'
     ```
 2. Edit the function handler code as follows:
     ```python
@@ -291,12 +240,14 @@ Please remember to substitute them with the details specific to your own C8 Depl
     c8fn-cli push -f hello-pydemo.yml 
     ```
     **Note:** You can also just use `docker push` if you prefer.
+    
     **IMPORTANT NOTE:** After the `push`, make sure to set the function repo to `public` in your Dockerhub, otherwise function invocation **may fail.**
 
 5. Use the `deploy` command, deploy the function onto your C8 Edge Fabric setup:
+
   a. Example deploy with all command line options, these will **override** the corresponding settings in the YAML definition file for the function :
     ```bash
-        c8fn-cli deploy -f hello-pydemo.yml -t _mm -g http://durga-e50-us-west-2.dev.aws.macrometa.io -n 'durga-e50-us-west-2, durga-3a8-eu-central-1'
+        c8fn-cli deploy -f hello-pydemo.yml -t tenant_name -g http://fabric.macrometa.io -n 'fabric-us-west-2, fabric-eu-central-1'
     ```
    b. Example deploy using the parameters in the YAML file:
     ```
@@ -305,18 +256,18 @@ Please remember to substitute them with the details specific to your own C8 Depl
     
 6. Use the `list` command to check whether function is available:
     ```bash
-    c8fn-cli list -g http://durga-e50-us-west-2.dev.aws.macrometa.io
+    c8fn-cli list -g http://fabric.macrometa.io
     ```
     Example output:
     ```bash
     Function        Invocations    	Replicas	Edge Locations                      
     --------        -----------    	--------	--------------                        
-    hello-pydemo    0              	1    	durga-e50-us-west-2, durga-3a8-eu-central-1
+    hello-pydemo    0              	1    	fabric-us-west-2, fabric-eu-central-1
     ```
 
 7. Use the `invoke` command to invoke the function from your C8 Edge Fabric deployment:
     ```bash
-    echo 'Hello' | c8fn-cli invoke hello-pydemo -g http://durga-e50-us-west-2.dev.aws.macrometa.io
+    echo 'Hello' | c8fn-cli invoke hello-pydemo -g http://fabric.macrometa.io
     ```
     Example output:
     ```
@@ -325,6 +276,6 @@ Please remember to substitute them with the details specific to your own C8 Depl
     
 8. Use the `remove` command to remove/delete the deployed function:
     ```bash
-    c8fn-cli remove hello-pydemo -g http://durga-e50-us-west-2.dev.aws.macrometa.io 
+    c8fn-cli remove hello-pydemo -g http://fabric.macrometa.io 
     ```
 
