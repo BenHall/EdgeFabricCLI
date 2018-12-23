@@ -1,3 +1,3 @@
-# C8CLI
+# Edge Fabric CLI
 
-CLI tools for Macrometa Digital Edge Fabric.
+CLI tools for Macrometa Global Edge Fabric.
