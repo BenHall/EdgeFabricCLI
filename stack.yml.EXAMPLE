@@ -1,0 +1,53 @@
+provider:
+  name: c8fn
+  gateway: https://fabric.macrometa.io  # can be a remote server
+  network: "func_functions"       # this is optional and defaults to func_functions
+
+functions:
+  url-ping:
+    lang: python
+    handler: ./sample/url-ping
+    image: macrometa/c8fn-url-ping:0.2
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
+  stronghash:
+    skip_build: true
+    image: functions/alpine:latest
+    fprocess: "sha512sum"
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
+  nodejs-echo:
+    lang: node
+    handler: ./sample/nodejs-echo
+    image: macrometa/c8fn-nodejs-echo:0.1
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
+  # curl 127.0.0.1:8080/function/shrink-image --data-binary @big.png > smaller.png
+  shrink-image:
+    lang: dockerfile
+    handler: ./sample/imagemagick
+    image: functions/resizer:0.1
+    fprocess: "convert - -resize 50% fd:1"
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
+  ruby-echo:
+    lang: ruby
+    handler: ./sample/ruby-echo
+    image: macrometa/c8fn-ruby-echo:0.2
+#    limits:
+#      memory: 40m
+#    requests:
+#      memory: 40m
+
