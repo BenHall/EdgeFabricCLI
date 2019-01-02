@@ -1,4 +1,4 @@
-FROM python:2.7-alpine
+FROM python:2.7-slim-stretch
 
 ARG ADDITIONAL_PACKAGE
 # Alternatively use ADD https:// (which will not be cached by Docker builder)

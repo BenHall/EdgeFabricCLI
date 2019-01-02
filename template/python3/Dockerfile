@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM python:3.7.0-slim-stretch
 
 # Allows you to add additional packages via build-arg
 ARG ADDITIONAL_PACKAGE
